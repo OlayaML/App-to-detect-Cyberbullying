@@ -6,14 +6,13 @@
 import pandas as pd
 from nltk.corpus import stopwords 
 from nltk.tokenize import word_tokenize
-from nltk.stem import WordNetLemmatizer
-#from googletrans import Translator
 from translate import Translator
 import string
+import csv
 
 '''    VIEW DATA   '''
 # Read data from file 'fromspring_data.csv' 
-df = pd.read_csv("formspring_data.csv", sep='\t')
+# df = pd.read_csv("formspring_data.csv", sep='\t')
 # View Data
 # pd.set_option('display.max_columns', 100)  # The maximum amount of columns to display
 # df.info()
@@ -87,49 +86,42 @@ for row in clean_mdf['Data']:
     clean_words = [word.lower() for word in words if word not in set(string.punctuation)]
     
     # REMOVAL STOP WORDS
-    characters_to_remove = ["haha","''",'``',"rt","https","‚Äô","‚Äú","‚Äù","\u200b","--","n't","'s","...","//t.c", "q", ":)", ":(","<3","<br>","br"]
+    characters_to_remove = ["haha","039","''","``","#","rt","https","í","ì","î","\u200b","--","n't","'s","...","//t.c", "q", ":)", ":(","<3","<br>","br"]
     clean_words = [word for word in clean_words if word not in set(stopwords.words('english'))]
     clean_words = [word for word in clean_words if word not in set(characters_to_remove)]
     
-    #print(clean_words)
 
     transclean_words = []
 
     # TRANSLATE THE DATASET TO SPANISH LANGUAGE
-    for word in clean_words:
-        translator = Translator(to_lang="es")
-        try:
-            translated = translator.translate(word)
+   # for word in clean_words:
+    #    translator = Translator(to_lang="es")
+     #   try:
+    #        translated = translator.translate(word)
             
-        except Exception as e:
-            print(str(e))
-            continue
+     #   except Exception as e:
+      #      print(str(e))
+      #      continue
         
-        transclean_words.append(translated.lower())
+        #transclean_words.append(translated.lower())
     
+    myData = " ".join(clean_words)
+    Data_list.append(myData)
+
+for myLabel in clean_mdf['Label']:
     
-    #print(transclean_words)
+    Labels_list.append(myLabel)
 
-    # LEMATISE WORDS
-    wordnet_lemmatizer = WordNetLemmatizer()
-    lemma_list = [wordnet_lemmatizer.lemmatize(word) for word in transclean_words]
-    Data_list.append(lemma_list)
-    
-    for row in clean_mdf['Label']:
-       
-        Labels_list.append(row)
-
-
-#Combine them to create bag of words
+# COMBINE THEM TO CREATE CLEANDATA.CSV
 combined = zip(Data_list, Labels_list)
 
 
-#Create bag of words and dictionary object
-def bag_of_words(words):
-    return dict([(word, True) for word in words])
-
-#Key, Value Pair into new list for modeling
-Final_Data = []
-for r, v in combined:
-    bag_of_words(r)
-    Final_Data.append((bag_of_words(r),v))
+'''    CREATE CLEANDATA.CSV   '''
+    
+with open('ENformspring_cleandata.csv', 'w', newline='') as myFile:
+    writer = csv.writer(myFile, delimiter='|')
+    writer.writerow({"SpanishData", "BullyingLabel"})
+    for data, label in combined:
+        writer.writerow({data,label})
+        
+print("Writing complete")
