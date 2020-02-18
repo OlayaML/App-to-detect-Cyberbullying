@@ -124,4 +124,4 @@ with open('ENformspring_cleandata.csv', 'w', newline='') as myFile:
     for data, label in combined:
         writer.writerow({data,label})
         
-print("Writing complete")
+print("Writing ENformspring_cleandata.csv complete")
