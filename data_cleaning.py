@@ -117,11 +117,10 @@ combined = zip(Data_list, Labels_list)
 
 
 '''    CREATE CLEANDATA.CSV   '''
-    
+
 with open('ENformspring_cleandata.csv', 'w', newline='') as myFile:
     writer = csv.writer(myFile, delimiter='|')
-    writer.writerow({"SpanishData", "BullyingLabel"})
-    for data, label in combined:
-        writer.writerow({data,label})
-        
+    writer.writerow(['EnglishData', 'BullyingLabel'])
+    writer.writerows(combined)
+
 print("Writing ENformspring_cleandata.csv complete")
