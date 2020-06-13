@@ -10,7 +10,7 @@ from google.cloud import translate_v2 as translate
 import string
 import csv
 
-''' FUNCTIONS '''
+'''    FUNCTIONS    '''
 def translate_text(text):  
     translate_client = translate.Client()
         
