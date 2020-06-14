@@ -55,7 +55,7 @@ print(label_list)
 # integer encode sequences of words
 tokenizer = Tokenizer()
 tokenizer.fit_on_texts(data_list)
-sequences = tokenizer.texts_to_sequences(data_list)
+messages = tokenizer.texts_to_sequences(data_list)
 
 # vocabulary size
 vocab_size = len(tokenizer.word_index) + 1
@@ -63,7 +63,8 @@ vocab_size = len(tokenizer.word_index) + 1
 ''' SEQUENCE INPUTS AND LABEL OUTPUT  '''
 # now that we have encoded the input sequences, 
 # we need to separate them into input (X) and output (y) elements.
-X = data_list
+messages = array(messages)
+X = messages
 y = label_list
 
 seq_length = X.shape[1]
