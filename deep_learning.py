@@ -1,13 +1,10 @@
 '''
 @author: olayamoranlevas
 '''
-from keras.layers.wrappers import Bidirectional
-from sklearn.externals._arff import DENSE
-from keras.layers.convolutional import Convolution2D
-from keras.layers.pooling import MaxPool1D
-from cffi.ffiplatform import flatten
+from keras.utils.np_utils import to_categorical
 
 '''    IMPORT LIBRARY   '''
+
 from numpy import array
 from pickle import dump
 from keras.preprocessing.text import Tokenizer
@@ -30,6 +27,7 @@ def load_doc(filename):
 
 
 '''    LOAD CLEAN DATASET    '''
+
 filename = 'ESPformspring_cleandata.csv'
 doc = load_doc(filename)
 lines = doc.split('\n')
@@ -41,55 +39,59 @@ label_list = []
 
 for line in lines:
     Data_Label = line.split('|')
-    data_list.append(Data_Label[0])
-    label_list.append(Data_Label[1])
+    
+    i = 0
+    for data in Data_Label:
+        if i == 0:
+            data_list.append(data)
+            i = i + 1
+        else:
+            label_list.append(data)
 
-'''    ENCODE DATASET    '''
+
+'''    ENCODE DATA    '''
 
 # integer encode sequences of words
 tokenizer = Tokenizer()
 tokenizer.fit_on_texts(data_list)
 tokendata_list = tokenizer.texts_to_sequences(data_list)
 
+#tokenizer.fit_on_texts(label_list)
+#tokenlabel_list = tokenizer.texts_to_sequences(label_list)
+
 # vocabulary size
 vocab_size = len(tokenizer.word_index) + 1
+
+intlabel_list = []
+
+for elem in label_list:
+    if (elem == '0.0' or elem == '1.0'):
+        elem.split('.')
+        intlabel_list.append(int(elem[0]))
 
 ''' SEQUENCE INPUTS AND LABEL OUTPUT  '''
 # now that we have encoded the input sequences, 
 # we need to separate them into input (X) and output (y) elements.
 
 listOftokendata_lists = array(tokendata_list)
-listOflabel_lists = array(label_list)
 X = listOftokendata_lists
-y = listOflabel_lists
+y = to_categorical(array(intlabel_list), num_classes=2)
+
 
 maxdata_length = 0
 for listElem in listOftokendata_lists:
     if (maxdata_length < len(listElem)):
         maxdata_length = len(listElem)
 
-print(maxdata_length)
-    
 '''    FIT MODEL   '''
 
 # define model
 model = Sequential()
-model.add(Embedding(vocab_size, input_length=maxdata_length))
-model.add(Convolution2D(f=3,k=4))
-model.add(MaxPool1D(p=5))
-model.add(flatten())
-model.add(Dense(n=10))
-model.add(Dense)
-
-
-#model.add(Embedding(vocab_size, 50, name="embedding"))
-#model.add(Bidirectional(LSTM(100, unit_forget_bias=True, name="lstm")))
-#model.add(Dense(vocab_size, activation = 'softmax', name="dense"))
-
-#model.add(LSTM(100, return_sequences=True))
-#model.add(LSTM(100))
-#model.add(Dense(100, activation='relu'))
-#model.add(Dense(vocab_size, activation='softmax'))
+model.add(Embedding(vocab_size, 50, input_length=1))
+model.add(LSTM(100, return_sequences=True))
+model.add(LSTM(100))
+model.add(Dense(100, activation='relu'))
+model.add(Dense(2, activation='softmax'))
 print(model.summary())
 
 # compile model
